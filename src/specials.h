@@ -37,6 +37,8 @@
 #define LOGGRAPH "-l"
 #define TEMPGRAD "-t"
 
+#define NAMED_ARG_PREFIX "--"
+
 enum special_types {
   NONSPECIAL = 0,
   HORIZONTAL_LINE = 1,
@@ -84,6 +86,10 @@ extern int special_count;
  * text_object.h */
 struct text_object;
 
+char *store_graph_positional_args(struct graph *, char *, char *, double);
+void get_option_value(char **, size_t, char *, const char *);
+template<typename T>
+void store_option_value(T, const char *, char *, const char *);
 /* scanning special arguments */
 const char *scan_bar(struct text_object *, const char *, double);
 const char *scan_gauge(struct text_object *, const char *, double);
