@@ -68,6 +68,8 @@ set(conky_sources
     exec.h
     fs.cc
     fs.h
+    gradient.cc
+    gradient.h
     mail.cc
     mail.h
     misc.cc
@@ -106,6 +108,18 @@ set(conky_sources
     luamm.hh
     data-source.cc
     data-source.hh
+    display-output.cc
+    display-output.hh
+    display-console.cc
+    display-console.hh
+    display-file.cc
+    display-file.hh
+    display-ncurses.cc
+    display-ncurses.hh
+    display-http.cc
+    display-http.hh
+    display-x11.cc
+    display-x11.hh
     lua-config.cc
     lua-config.hh
     setting.cc
@@ -212,8 +226,13 @@ if(BUILD_PORT_MONITORS)
   set(optional_sources ${optional_sources} ${port_monitors})
 endif(BUILD_PORT_MONITORS)
 
+if(BUILD_GUI)
+  set(gui fonts.cc fonts.h)
+  set(optional_sources ${optional_sources} ${gui})
+endif(BUILD_GUI)
+
 if(BUILD_X11)
-  set(x11 x11.cc x11.h fonts.cc fonts.h)
+  set(x11 x11.cc x11.h)
   set(optional_sources ${optional_sources} ${x11})
 
   if(BUILD_XINERAMA)
@@ -236,11 +255,6 @@ if(BUILD_RSS)
   set(rss rss.cc rss.h prss.cc prss.h)
   set(optional_sources ${optional_sources} ${rss})
 endif(BUILD_RSS)
-
-if(BUILD_WEATHER)
-  set(weather weather.cc weather.h)
-  set(optional_sources ${optional_sources} ${weather})
-endif(BUILD_WEATHER)
 
 if(BUILD_NVIDIA)
   set(nvidia nvidia.cc nvidia.h)
@@ -287,16 +301,13 @@ if(BUILD_INTEL_BACKLIGHT)
   set(optional_sources ${optional_sources} ${intel_backlight})
 endif(BUILD_INTEL_BACKLIGHT)
 
-if(BUILD_HSV_GRADIENT)
-  set(hsv_gradient hsv_gradient.cc hsv_gradient.h)
-  set(optional_sources ${optional_sources} ${hsv_gradient})
-endif(BUILD_HSV_GRADIENT)
-
 if(BUILD_TESTS)
   # Create a library strictly for testing
   add_library(conky_core ${conky_sources} ${optional_sources})
+  add_dependencies(conky_core generated_hdr_files)
   target_link_libraries(conky_core ${conky_libs})
   add_executable(conky main.cc)
+  add_dependencies(conky generated_hdr_files)
   target_link_libraries(conky conky_core ${conky_libs})
   install(TARGETS conky_core
           RUNTIME DESTINATION bin
@@ -304,6 +315,7 @@ if(BUILD_TESTS)
           ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
 else()
   add_executable(conky main.cc ${conky_sources} ${optional_sources})
+  add_dependencies(conky generated_hdr_files)
   target_link_libraries(conky ${conky_libs})
 endif()
 

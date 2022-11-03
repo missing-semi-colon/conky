@@ -34,6 +34,7 @@ cmake                                  \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo    \
   -DRELEASE=ON                         \
   -DBUILD_AUDACIOUS=ON                 \
+  -DBUILD_DOCS=ON                      \
   -DBUILD_HTTP=ON                      \
   -DBUILD_ICAL=ON                      \
   -DBUILD_ICONV=ON                     \
@@ -74,4 +75,13 @@ chmod +x appimagetool-x86_64.AppImage
 
 ./appimagetool-x86_64.AppImage AppDir --sign --sign-key E3034071
 
-mv conky*.AppImage "$OLD_CWD"
+for f in conky*.AppImage
+do
+  sha256sum $f > $f.sha256
+done
+
+mv conky*.AppImage* "$OLD_CWD"
+
+# gzip & copy the man page, which will be attached to releases
+gzip doc/conky.1
+mv doc/conky.1.gz "$OLD_CWD"

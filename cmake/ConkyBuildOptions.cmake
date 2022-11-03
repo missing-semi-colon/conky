@@ -37,12 +37,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # -std options for all build types
-set(CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}"
-    CACHE STRING "Flags used by the C compiler during all build types."
-    FORCE)
-set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}"
-    CACHE STRING "Flags used by the C++ compiler during all build types."
-    FORCE)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -78,7 +73,8 @@ if(MAINTAINER_MODE)
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       set(USING_CLANG true)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+      add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,Clang>:-stdlib=libc++>)
+      add_link_options($<$<COMPILE_LANG_AND_ID:CXX,Clang>:-stdlib=libc++>)
     endif()
 endif(MAINTAINER_MODE)
 
@@ -90,6 +86,7 @@ mark_as_advanced(RELEASE)
 option(MAINTAINER_MODE "Enable maintainer mode" false)
 
 option(BUILD_DOCS "Build documentation" false)
+option(BUILD_EXTRAS "Build extras (includes syntax files for editors)" false)
 
 option(BUILD_I18N "Enable if you want internationalization support" true)
 if(BUILD_I18N)
@@ -207,6 +204,11 @@ else(BUILD_X11)
   set(BUILD_NVIDIA false)
 endif(BUILD_X11)
 
+# if we build with any GUI support
+if(BUILD_X11)
+  set(BUILD_GUI true)
+endif(BUILD_X11)
+
 if(OWN_WINDOW)
   option(BUILD_ARGB "Build ARGB (real transparency) support" true)
 else(OWN_WINDOW)
@@ -233,10 +235,10 @@ option(BUILD_CURL "Enable if you want Curl support" false)
 
 option(BUILD_RSS "Enable if you want RSS support" false)
 
-option(BUILD_WEATHER_METAR "Enable METAR weather support" true)
-if(BUILD_WEATHER_METAR OR BUILD_RSS)
+if(BUILD_RSS)
+  # if RSS is enabled, curl is required
   set(BUILD_CURL true)
-endif(BUILD_WEATHER_METAR OR BUILD_RSS)
+endif(BUILD_RSS)
 
 option(BUILD_APCUPSD "Enable APCUPSD support" true)
 
@@ -261,8 +263,6 @@ option(BUILD_PULSEAUDIO
 
 option(BUILD_INTEL_BACKLIGHT
        "Enable support for Intel backlight" false)
-
-option(BUILD_HSV_GRADIENT "Enable gradient in HSV colour space" true)
 
 message(STATUS "CMAKE_C_FLAGS: " ${CMAKE_C_FLAGS})
 message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})

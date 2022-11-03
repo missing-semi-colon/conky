@@ -80,8 +80,6 @@
 
 #cmakedefine BUILD_CURL 1
 
-#cmakedefine BUILD_WEATHER_METAR 1
-
 #cmakedefine BUILD_IMLIB2 1
 
 #cmakedefine BUILD_MATH 1
@@ -112,6 +110,8 @@
 #cmakedefine BUILD_IPV6 1
 
 #cmakedefine BUILD_HTTP 1
+
+#cmakedefine BUILD_GUI 1
 
 #cmakedefine BUILD_ICONV 1
 
